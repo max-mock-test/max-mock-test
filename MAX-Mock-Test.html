@@ -1,0 +1,704 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MAX Mock Test</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.11.338/pdf.min.js"></script>
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background: #0F2027;
+            background: -webkit-linear-gradient(to right, #2C5364, #203A43, #0F2027);
+            background: linear-gradient(to right, #2C5364, #203A43, #0F2027);
+        }
+        .main-card {
+            background-color: rgba(255, 255, 255, 0.98);
+            backdrop-filter: blur(5px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: opacity 0.5s ease-in-out;
+        }
+        .btn-gradient {
+            background-image: linear-gradient(to right, #1A2980 0%, #26D0CE  51%, #1A2980  100%);
+            transition: 0.5s;
+            background-size: 200% auto;
+            color: white;
+            box-shadow: 0 4px 15px 0 rgba(65, 132, 234, 0.4);
+        }
+        .btn-gradient:hover {
+            background-position: right center;
+        }
+        .btn-ai {
+            background-image: linear-gradient(to right, #6a11cb 0%, #2575fc 100%);
+            transition: 0.5s;
+            background-size: 200% auto;
+            color: white;
+            box-shadow: 0 4px 15px 0 rgba(106, 17, 203, 0.4);
+        }
+         .btn-ai:hover {
+            background-position: right center;
+        }
+        .progress-bar-container {
+            width: 100%;
+            background-color: #e0e0e0;
+            border-radius: 9999px;
+            height: 10px;
+            overflow: hidden;
+        }
+        .progress-bar {
+            background-image: linear-gradient(to right, #84fab0 0%, #8fd3f4 100%);
+            height: 100%;
+            border-radius: 9999px;
+            transition: width 0.4s ease-in-out;
+        }
+        .option-btn.correct {
+            background-color: #d1fae5 !important;
+            border-color: #10b981 !important;
+            color: #065f46;
+            font-weight: 600;
+        }
+        .option-btn.incorrect {
+            background-color: #fee2e2 !important;
+            border-color: #ef4444 !important;
+            color: #991b1b;
+        }
+        .spinner, .preloader-spinner {
+            border: 4px solid rgba(255, 255, 255, 0.2);
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            border-left-color: #26D0CE;
+            animation: spin 1s ease infinite;
+        }
+        .spinner { width: 36px; height: 36px; border-color: rgba(0,0,0,0.1); border-left-color: #26D0CE; }
+        #preloader {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background: #0F2027;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+            transition: opacity 0.5s ease;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(15px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .fade-in { animation: fadeIn 0.5s ease-out forwards; }
+        @keyframes shake {
+            10%, 90% { transform: translate3d(-1px, 0, 0); }
+            20%, 80% { transform: translate3d(2px, 0, 0); }
+            30%, 50%, 70% { transform: translate3d(-4px, 0, 0); }
+            40%, 60% { transform: translate3d(4px, 0, 0); }
+        }
+        .shake { animation: shake 0.82s cubic-bezier(.36,.07,.19,.97) both; }
+        .review-option.correct { background-color: #d1fae5; border-left-color: #10b981; }
+        .review-option.user-choice { background-color: #fee2e2; border-left-color: #ef4444; }
+        .review-option.correct.user-choice { background-color: #d1fae5; border-left-color: #10b981; }
+    </style>
+</head>
+<body class="flex items-center justify-center min-h-screen p-4">
+
+    <div id="preloader">
+        <div class="preloader-spinner"></div>
+    }
+    </div>
+
+    <div class="main-card rounded-2xl shadow-2xl w-full max-w-4xl mx-auto p-6 sm:p-8 md:p-10 transform transition-all opacity-0" style="display:none;">
+
+        <!-- Header -->
+        <div class="text-center border-b pb-4 mb-6">
+             <div class="flex justify-center items-center gap-3">
+                 <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-gray-700"><path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"></path></svg>
+                <h1 class="text-3xl sm:text-4xl font-bold text-gray-800">MAX Mock Test</h1>
+             </div>
+            <p class="text-gray-500 mt-2">Upload your DGCA pattern questions to start a mock test with AI-powered feedback.</p>
+        </div>
+
+        <!-- View: Upload Questions -->
+        <div id="upload-view">
+             <h2 class="text-xl font-semibold text-gray-700 mb-2">Add Your Questions</h2>
+            <p class="text-sm text-gray-500 mb-4">You can either paste your questions directly or upload a PDF file.</p>
+            <div>
+                 <label for="pdf-upload" class="w-full text-center cursor-pointer bg-gray-600 text-white font-semibold py-3 px-6 rounded-lg transition-transform transform hover:scale-105 active:scale-95 inline-block">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="inline-block mr-2 align-middle"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" x2="12" y1="3" y2="15"/></svg>
+                    Upload Questions from PDF
+                </label>
+                <input type="file" id="pdf-upload" class="hidden" accept=".pdf">
+                <p id="pdf-status" class="text-center text-sm text-gray-500 mt-2"></p>
+            </div>
+            <div class="my-4 flex items-center"><div class="flex-grow border-t border-gray-300"></div><span class="flex-shrink mx-4 text-gray-400 font-semibold">OR</span><div class="flex-grow border-t border-gray-300"></div></div>
+            <p class="text-sm text-gray-500 mb-2">Paste your questions below. Including "Correct: (a)" is now optional.</p>
+            <textarea id="questions-input" class="w-full h-48 p-3 border bg-gray-50 border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition" placeholder="Example: 1. Question text here? (a) option 1 (b) option 2 (c) option 3"></textarea>
+            <p id="upload-error" class="text-red-500 text-sm mt-2 hidden"></p>
+            <button id="start-btn" class="mt-4 w-full btn-gradient font-semibold py-3 px-6 rounded-lg transition-transform transform hover:scale-105 active:scale-95">Start Mock Test</button>
+        </div>
+
+        <!-- View: Test in Progress -->
+        <div id="test-view" class="hidden">
+            <div class="flex justify-between items-center mb-2"><p id="progress-text" class="text-lg font-medium text-gray-600"></p><p id="score-text" class="text-lg font-bold text-blue-600">Score: 0</p></div>
+            <div class="progress-bar-container mb-4"><div id="progress-bar" class="progress-bar" style="width: 0%;"></div></div>
+            <div class="bg-gray-50 p-6 rounded-lg border border-gray-200">
+                <p id="question-text" class="text-xl font-semibold text-gray-800 mb-6 leading-relaxed"></p>
+                <div id="options-container" class="space-y-3"></div>
+            </div>
+            <div id="explanation-trigger-container" class="mt-4 text-center hidden">
+                <button id="show-explanation-btn" class="text-blue-600 hover:underline font-semibold py-2">
+                    Show Explanation
+                </button>
+            </div>
+            <div id="feedback-section" class="mt-6 p-5 bg-sky-50 border border-sky-200 rounded-lg hidden">
+                 <h3 class="font-bold text-lg text-sky-800 mb-3 flex items-center gap-2"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-sparkles"><path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"/><path d="M5 3v4"/><path d="M19 17v4"/><path d="M3 5h4"/><path d="M17 19h4"/></svg>MAX</h3>
+                 <div id="spinner" class="spinner mx-auto my-4 hidden"></div>
+                 <p id="explanation-text" class="text-gray-700 leading-relaxed"></p>
+                 <div id="feedback-buttons" class="mt-4 flex items-center justify-center gap-4 hidden">
+                    <button id="understood-btn" class="flex-1 bg-green-100 text-green-800 font-semibold py-2 px-4 rounded-lg border border-green-200 hover:bg-green-200 transition active:scale-95">Understood</button>
+                    <button id="not-understood-btn" class="flex-1 bg-amber-100 text-amber-800 font-semibold py-2 px-4 rounded-lg border border-amber-200 hover:bg-amber-200 transition active:scale-95">Explain Again (Simpler)</button>
+                 </div>
+            </div>
+            <div class="mt-6 flex justify-end">
+                <button id="next-btn" class="bg-gray-700 text-white font-semibold py-2 px-8 rounded-lg hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 hidden active:scale-95">Next</button>
+                <button id="results-btn" class="btn-gradient font-semibold py-2 px-8 rounded-lg hidden active:scale-95">Show Results</button>
+            </div>
+        </div>
+
+        <!-- View: Results -->
+        <div id="results-view" class="hidden text-center">
+            <h2 class="text-3xl font-bold text-gray-800">Test Complete!</h2>
+            <p id="final-score" class="text-5xl font-bold text-blue-600 my-6"></p>
+            <p id="final-message" class="text-xl text-gray-600 mb-6"></p>
+            <p id="motivational-quote" class="text-lg text-gray-500 italic my-6 px-4"></p>
+            <div class="flex flex-col sm:flex-row gap-4 justify-center">
+                <button id="review-btn" class="bg-gray-200 text-gray-800 font-semibold py-3 px-8 rounded-lg transition-transform transform hover:scale-105 active:scale-95">Review Answers</button>
+                <button id="restart-btn" class="btn-gradient font-semibold py-3 px-8 rounded-lg transition-transform transform hover:scale-105 active:scale-95">Take Another Test</button>
+            </div>
+             <div class="mt-6 pt-6 border-t border-gray-200 flex flex-col sm:flex-row gap-4 justify-center">
+                <button id="ai-analysis-btn" class="flex-1 btn-ai font-semibold py-3 px-6 rounded-lg transition-transform transform hover:scale-105 active:scale-95">✨ Get AI Performance Analysis</button>
+                <button id="generate-new-btn" class="flex-1 btn-ai font-semibold py-3 px-6 rounded-lg transition-transform transform hover:scale-105 active:scale-95">✨ Generate New Test</button>
+             </div>
+             <div id="ai-analysis-container" class="mt-6 p-5 bg-purple-50 border border-purple-200 rounded-lg hidden text-left">
+                 <h3 class="font-bold text-lg text-purple-800 mb-3 flex items-center gap-2">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-brain-circuit"><path d="M12 5a3 3 0 1 0-5.993.142"/><path d="M18 13a3 3 0 1 0-4.413 2.5"/><path d="M11.5 6.5A3 3 0 1 0 10 12"/><path d="M12 13a3 3 0 1 0 5.993-.142"/><path d="M18 5a3 3 0 1 0-5.993-.142"/><path d="M6.007 17.858A3 3 0 1 0 7.5 12"/><path d="M6.5 17.5a3 3 0 1 0-1.413-2.5"/><path d="M12.5 17.5a3 3 0 1 0 1.413 2.5"/><path d="M12 12v1.5"/><path d="M12 18v1.5"/><path d="M15 13.5v-1.5"/><path d="M14.5 5.5v-1"/><path d="M9.5 5.5v-1"/><path d="M7 11.5H5.5"/><path d="M17 11.5H18.5"/><path d="M9 13.5v-1.5"/><path d="M7.5 9H9"/><path d="M14.5 14.5H16"/><path d="M14 8.5h-1.5"/><path d="M9.5 14.5H8"/></svg>
+                    AI Performance Analysis
+                </h3>
+                 <div id="ai-analysis-spinner" class="spinner mx-auto my-4 hidden"></div>
+                 <p id="ai-analysis-text" class="text-gray-700 leading-relaxed"></p>
+             </div>
+             <div class="mt-8 flex justify-center">
+                 <button id="share-btn" class="bg-blue-500 text-white font-semibold py-2 px-6 rounded-lg flex items-center gap-2 hover:bg-blue-600 transition-transform transform hover:scale-105 active:scale-95">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" x2="15.42" y1="13.51" y2="17.49"/><line x1="15.41" x2="8.59" y1="6.51" y2="10.49"/></svg>
+                    Share Score
+                </button>
+            </div>
+            <p id="share-feedback" class="text-sm text-green-600 mt-2 h-4"></p>
+            <div class="mt-8 pt-6 border-t border-gray-200">
+                <p class="text-sm text-gray-500">For feedback or issues, please contact:</p>
+                <div class="flex items-center justify-center gap-3 mt-3">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="currentColor" class="text-green-500"><path d="M16.75 13.96c.25.13.41.2.46.3.06.11.04.61-.21 1.18-.2.56-1.24 1.1-1.7 1.12-.46.02-.83.02-1.22-.15-.4-.17-1.24-.57-2.3-1.64-1.3-1.28-2.19-2.77-2.36-3.14-.17-.38-.02-.61.13-.8.13-.17.28-.45.43-.64.15-.18.28-.41.42-.62.15-.22.06-.41-.04-.57-.1-.16-.9-1.05-1.23-1.45-.33-.4-.65-.34-.88-.34-.22,0-.46.02-.66.02a2.3,2.3,0,0,0-1.6,1.06,3.39,3.39,0,0,0-1,2.46c0,1.41.43,2.78,1,3.92,1.23,2.42,3,4.3,5.4,5.47,2.38,1.18,3.97,1.23,5,1.05,1.05-.18,2.42-1.5,2.73-2.97.24-1.15.24-2.19.18-2.39-.06-.2-.33-.3-.7-.46-.36-.17-2.42-1.18-2.8-1.36-.38-.17-.65-.24-.93.24-.28.48-.9,1.18-1.1,1.35-.2.17-.41.2-.65.13-.25-.07-1.1-1.05-2.28-2.08S8.2,10.6,8.04,10.37c-.17-.28,0-.45.18-.62.18-.18.4-.5.58-.75.18-.25.23-.42.34-.68.1-.27,0-.52-.08-.68-.08-.17-.48-1.1-2.02-1.3-.3-.04-.6-.04-.83-.04a2.27,2.27,0,0,0-2.2,2.1,5.3,5.3,0,0,0,1.52,4.1,8.9,8.9,0,0,0,3.62,3.62,8.8,8.8,0,0,0,4.1,1.52,5.26,5.26,0,0,0,4.4-2.18,3.22,3.22,0,0,0,.43-2.23c-.1-.63-.5-1.02-.75-1.18-.25-.16-1-1.1-1.1-1.1-.1-.08-.13-.13-.15-.13a.43.43,0,0,0-.31.13c-.1.1-.23.31-.33.45-.1.15-.2.28-.3.41-.1.13-.18.17-.3.1-.12-.06-1-1.02-1.18-1.18Z"/></svg>
+                    <p class="font-semibold text-gray-700">Alok | WhatsApp: 9360485469</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- View: Review -->
+        <div id="review-view" class="hidden">
+            <div class="flex justify-between items-center mb-6">
+                <h2 class="text-3xl font-bold text-gray-800">Review Answers</h2>
+                <button id="back-to-results-btn" class="bg-gray-200 text-gray-800 font-semibold py-2 px-6 rounded-lg hover:bg-gray-300 active:scale-95">Back to Results</button>
+            </div>
+            <div id="review-container" class="space-y-6"></div>
+        </div>
+
+    </div>
+
+<script>
+    // --- App Initialization ---
+    window.onload = () => {
+        const preloader = document.getElementById('preloader');
+        const mainCard = document.querySelector('.main-card');
+        preloader.style.opacity = '0';
+        setTimeout(() => {
+            preloader.style.display = 'none';
+            mainCard.style.display = 'block';
+            setTimeout(() => mainCard.style.opacity = '1', 50);
+        }, 500);
+    };
+
+    pdfjsLib.GlobalWorkerOptions.workerSrc = `https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.11.338/pdf.worker.min.js`;
+    
+    // --- DOM Elements ---
+    const allViews = {
+        upload: document.getElementById('upload-view'),
+        test: document.getElementById('test-view'),
+        results: document.getElementById('results-view'),
+        review: document.getElementById('review-view'),
+    };
+
+    const questionsInput = document.getElementById('questions-input');
+    const startBtn = document.getElementById('start-btn');
+    const uploadError = document.getElementById('upload-error');
+    const pdfUploadInput = document.getElementById('pdf-upload');
+    const pdfStatus = document.getElementById('pdf-status');
+    const progressText = document.getElementById('progress-text');
+    const scoreText = document.getElementById('score-text');
+    const progressBar = document.getElementById('progress-bar');
+    const questionText = document.getElementById('question-text');
+    const optionsContainer = document.getElementById('options-container');
+    const explanationTriggerContainer = document.getElementById('explanation-trigger-container');
+    const showExplanationBtn = document.getElementById('show-explanation-btn');
+    const feedbackSection = document.getElementById('feedback-section');
+    const explanationText = document.getElementById('explanation-text');
+    const spinner = document.getElementById('spinner');
+    const feedbackButtons = document.getElementById('feedback-buttons');
+    const understoodBtn = document.getElementById('understood-btn');
+    const notUnderstoodBtn = document.getElementById('not-understood-btn');
+    const nextBtn = document.getElementById('next-btn');
+    const resultsBtn = document.getElementById('results-btn');
+    const finalScore = document.getElementById('final-score');
+    const finalMessage = document.getElementById('final-message');
+    const restartBtn = document.getElementById('restart-btn');
+    const motivationalQuote = document.getElementById('motivational-quote');
+    const reviewBtn = document.getElementById('review-btn');
+    const backToResultsBtn = document.getElementById('back-to-results-btn');
+    const reviewContainer = document.getElementById('review-container');
+    const shareBtn = document.getElementById('share-btn');
+    const shareFeedback = document.getElementById('share-feedback');
+    const aiAnalysisBtn = document.getElementById('ai-analysis-btn');
+    const generateNewBtn = document.getElementById('generate-new-btn');
+    const aiAnalysisContainer = document.getElementById('ai-analysis-container');
+    const aiAnalysisSpinner = document.getElementById('ai-analysis-spinner');
+    const aiAnalysisText = document.getElementById('ai-analysis-text');
+
+
+    // --- App State ---
+    let questions = [];
+    let currentQuestionIndex = 0;
+    let score = 0;
+    const quotes = [ "The sky is not the limit; it's just the beginning.", "Every takeoff is optional. Every landing is mandatory. Keep studying.", "Clear skies ahead for those who prepare today.", "The expert in anything was once a beginner. You're on the right path.", "Don't watch the clock; do what it does. Keep going." ];
+
+    // --- Gemini API Configuration ---
+    const apiKey = "";
+    const model = "gemini-2.5-flash-preview-09-2025";
+    const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`;
+
+    // --- Event Listeners ---
+    startBtn.addEventListener('click', startTest);
+    nextBtn.addEventListener('click', () => { currentQuestionIndex++; displayQuestion(); });
+    resultsBtn.addEventListener('click', showResults);
+    restartBtn.addEventListener('click', () => {
+        switchView('upload');
+        questionsInput.value = '';
+        pdfStatus.textContent = '';
+        pdfUploadInput.value = '';
+    });
+    pdfUploadInput.addEventListener('change', handlePdfUpload);
+    showExplanationBtn.addEventListener('click', handleShowExplanation);
+    understoodBtn.addEventListener('click', () => feedbackButtons.classList.add('hidden'));
+    notUnderstoodBtn.addEventListener('click', handleNotUnderstood);
+    reviewBtn.addEventListener('click', showReview);
+    backToResultsBtn.addEventListener('click', showResults);
+    shareBtn.addEventListener('click', shareScore);
+    aiAnalysisBtn.addEventListener('click', handleAiAnalysis);
+    generateNewBtn.addEventListener('click', handleGenerateNewTest);
+
+
+    // --- Core Functions ---
+    
+    function switchView(viewName) {
+        Object.values(allViews).forEach(view => view.classList.add('hidden'));
+        if (allViews[viewName]) {
+            allViews[viewName].classList.remove('hidden');
+            allViews[viewName].classList.add('fade-in');
+        }
+    }
+
+    async function handlePdfUpload(event) {
+        const file = event.target.files[0];
+        if (!file || file.type !== 'application/pdf') {
+            pdfStatus.textContent = 'Please select a PDF file.';
+            return;
+        }
+        pdfStatus.textContent = 'Processing PDF... please wait.';
+        questionsInput.value = '';
+        try {
+            const fileReader = new FileReader();
+            fileReader.onload = async function() {
+                const typedarray = new Uint8Array(this.result);
+                const pdf = await pdfjsLib.getDocument(typedarray).promise;
+                let fullText = '';
+                for (let i = 1; i <= pdf.numPages; i++) {
+                    const page = await pdf.getPage(i);
+                    const textContent = await page.getTextContent();
+                    fullText += textContent.items.map(item => item.str).join(' ') + '\n\n';
+                }
+                questionsInput.value = fullText.trim();
+                pdfStatus.textContent = `Successfully extracted text from "${file.name}".`;
+            };
+            fileReader.readAsArrayBuffer(file);
+        } catch (error) {
+            console.error('Error processing PDF:', error);
+            pdfStatus.textContent = 'Failed to process PDF.';
+        }
+    }
+
+    function parseQuestions(text) {
+        try {
+            const questionsArray = [];
+            const normalizedText = text.replace(/\r\n/g, '\n').trim();
+            const questionBlockRegex = /(\d+[\.\)]\s*.*?)(?=\n*\s*\d+[\.\)]\s*|$)/gs;
+            const matches = normalizedText.matchAll(questionBlockRegex);
+
+            for (const match of matches) {
+                const block = match[1];
+                if (!block.trim()) continue;
+
+                let correct = null;
+                let content = block.trim();
+
+                const correctMatch = content.match(/\s*Correct:\s*\(([a-zA-Z])\)/i);
+                if (correctMatch) {
+                    correct = correctMatch[1].trim().toLowerCase();
+                    content = content.replace(correctMatch[0], '').trim();
+                }
+
+                const optionsStartIndex = content.search(/\([a-zA-Z]\)/);
+                if (optionsStartIndex === -1) continue;
+
+                const questionText = content.substring(0, optionsStartIndex).replace(/^\d+[\.\)]\s*/, '').trim();
+                const optionsString = content.substring(optionsStartIndex);
+                
+                const parsedOptions = [];
+                const optionParseRegex = /\(([a-zA-Z])\)\s*(.*?)(?=\s*\([a-zA-Z]\)|$)/gs;
+                let optionMatch;
+                while ((optionMatch = optionParseRegex.exec(optionsString)) !== null) {
+                    parsedOptions.push({
+                        char: optionMatch[1].trim().toLowerCase(),
+                        text: optionMatch[2].replace(/\s+/g, ' ').trim()
+                    });
+                }
+
+                if (!questionText || parsedOptions.length < 2) continue;
+                
+                questionsArray.push({ text: questionText, options: parsedOptions, correct: correct, userAnswer: null, explanation: '' });
+            }
+            
+            return questionsArray;
+
+        } catch (error) { 
+            console.error("Parsing error:", error); 
+            return null; 
+        }
+    }
+
+    function startTest() {
+        const parsed = parseQuestions(questionsInput.value);
+        if (!parsed || parsed.length === 0) {
+            uploadError.textContent = 'Could not parse questions. Check format and try again.';
+            uploadError.classList.remove('hidden');
+            questionsInput.classList.add('shake');
+            setTimeout(() => questionsInput.classList.remove('shake'), 820);
+            return;
+        }
+        questions = parsed;
+        currentQuestionIndex = 0;
+        score = 0;
+        uploadError.classList.add('hidden');
+        switchView('test');
+        updateScoreDisplay();
+        displayQuestion();
+    }
+    
+    function displayQuestion() {
+        explanationTriggerContainer.classList.add('hidden');
+        feedbackSection.classList.add('hidden');
+        feedbackButtons.classList.add('hidden');
+        notUnderstoodBtn.classList.remove('hidden');
+        explanationText.textContent = '';
+        nextBtn.classList.add('hidden');
+        resultsBtn.classList.add('hidden');
+
+        const question = questions[currentQuestionIndex];
+        progressText.textContent = `Question ${currentQuestionIndex + 1} of ${questions.length}`;
+        questionText.textContent = question.text;
+        optionsContainer.innerHTML = '';
+
+        question.options.forEach(option => {
+            const button = document.createElement('button');
+            button.className = 'option-btn w-full text-left p-4 border-2 border-gray-300 rounded-lg hover:bg-gray-100 hover:border-blue-400 focus:outline-none focus:ring-2 focus:ring-blue-400 transition active:scale-[0.98]';
+            button.innerHTML = `<span class="font-bold mr-3">${option.char.toUpperCase()})</span> ${option.text}`;
+            button.dataset.char = option.char;
+            button.addEventListener('click', handleOptionClick);
+            optionsContainer.appendChild(button);
+        });
+        updateProgressBar();
+    }
+    
+    function updateProgressBar() {
+        progressBar.style.width = `${((currentQuestionIndex) / questions.length) * 100}%`;
+    }
+
+    async function handleOptionClick(e) {
+        const selectedButton = e.currentTarget;
+        const selectedChar = selectedButton.dataset.char;
+        let question = questions[currentQuestionIndex];
+        question.userAnswer = selectedChar;
+
+        Array.from(optionsContainer.children).forEach(btn => btn.disabled = true);
+        let correctAnswer = question.correct;
+
+        if (!correctAnswer) {
+            explanationTriggerContainer.classList.remove('hidden');
+            showExplanationBtn.textContent = 'Verifying...';
+            showExplanationBtn.disabled = true;
+            try {
+                correctAnswer = await getCorrectAnswerFromAI(question);
+                question.correct = correctAnswer;
+            } catch (error) {
+                showExplanationBtn.textContent = 'Verification Failed';
+                console.error("Verification failed:", error);
+                 if (currentQuestionIndex < questions.length - 1) nextBtn.classList.remove('hidden');
+                 else resultsBtn.classList.remove('hidden');
+                return;
+            } finally {
+                showExplanationBtn.textContent = 'Show Explanation';
+                showExplanationBtn.disabled = false;
+            }
+        }
+
+        if (selectedChar === correctAnswer) score++;
+        updateScoreDisplay();
+        
+        progressBar.style.width = `${((currentQuestionIndex + 1) / questions.length) * 100}%`;
+        Array.from(optionsContainer.children).forEach(btn => {
+            if (btn.dataset.char === correctAnswer) btn.classList.add('correct');
+            else if (btn.dataset.char === selectedChar) btn.classList.add('incorrect');
+        });
+        
+        explanationTriggerContainer.classList.remove('hidden');
+        if (currentQuestionIndex < questions.length - 1) nextBtn.classList.remove('hidden');
+        else resultsBtn.classList.remove('hidden');
+    }
+
+    function handleShowExplanation() {
+        explanationTriggerContainer.classList.add('hidden');
+        feedbackSection.classList.remove('hidden', 'fade-in');
+        void feedbackSection.offsetWidth; // Trigger reflow
+        feedbackSection.classList.add('fade-in');
+        spinner.classList.remove('hidden');
+        explanationText.textContent = '';
+        
+        const question = questions[currentQuestionIndex];
+        getAIExplanation(question, question.userAnswer);
+    }
+
+    async function getCorrectAnswerFromAI(question) {
+        const { text, options } = question;
+        const optionsString = options.map(o => `(${o.char}) ${o.text}`).join('\n');
+        const systemPrompt = "You are an AI aviation expert. Identify the single correct answer for a DGCA-style multiple-choice question.";
+        const userPrompt = `Analyze the following DGCA question and determine the correct answer. Respond with ONLY the letter of the correct option in parentheses, like (b). Do not provide any other text.\n\nQuestion: ${text}\nOptions:\n${optionsString}`;
+        const response = await makeApiCall(userPrompt, systemPrompt);
+        const match = response.match(/\(([a-zA-Z])\)/);
+        if (match && match[1]) return match[1].toLowerCase();
+        throw new Error("AI response was in an invalid format.");
+    }
+
+    async function getAIExplanation(question, selectedAnswer, isSimplified = false) {
+        const { text, options, correct } = question;
+        const correctText = options.find(o => o.char === correct)?.text || "N/A";
+        
+        const systemPrompt = isSimplified 
+            ? "You are a friendly teacher who excels at making complex topics simple. Explain things so a child could understand."
+            : "You are an expert aviation electronics instructor providing clear explanations for mock test questions based on DGCA patterns.";
+        
+        const userPrompt = isSimplified
+            ? `Please re-explain the answer to this question in a very simple way. Use an analogy if it helps. Avoid technical jargon.\n\nQuestion: "${text}"\nCorrect Answer is: "(${correct}) ${correctText}"`
+            : `A student is taking a test. Explain the answer.\n\nQuestion: ${text}\nOptions:\n${options.map(o => `(${o.char}) ${o.text}`).join('\n')}\n\nThe student chose: (${selectedAnswer})\nThe correct answer is: (${correct}) ${correctText}\n\nPlease explain why the correct answer is right and the others are wrong. Keep it professional and educational.`;
+
+        try {
+            const result = await makeApiCall(userPrompt, systemPrompt);
+            explanationText.innerHTML = result.replace(/\n/g, '<br>');
+            if (!isSimplified) question.explanation = result; // Store the detailed explanation for review
+        } catch (error) {
+            explanationText.textContent = "Sorry, an error occurred while fetching the explanation.";
+            console.error("API Error:", error);
+        } finally {
+            spinner.classList.add('hidden');
+            if (isSimplified) {
+                 notUnderstoodBtn.classList.add('hidden');
+                 understoodBtn.classList.remove('hidden');
+            }
+            feedbackButtons.classList.remove('hidden');
+        }
+    }
+    
+    function handleNotUnderstood() {
+        spinner.classList.remove('hidden');
+        explanationText.innerHTML = '';
+        feedbackButtons.classList.add('hidden');
+        getAIExplanation(questions[currentQuestionIndex], questions[currentQuestionIndex].userAnswer, true);
+    }
+    
+    async function makeApiCall(userPrompt, systemPrompt = "", retries = 3, delay = 1000) {
+        const payload = { contents: [{ parts: [{ text: userPrompt }] }], systemInstruction: { parts: [{ text: systemPrompt }] } };
+        for (let i = 0; i < retries; i++) {
+             try {
+                const response = await fetch(apiUrl, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
+                if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+                const result = await response.json();
+                const candidate = result.candidates?.[0];
+                if (candidate && candidate.content?.parts?.[0]?.text) return candidate.content.parts[0].text;
+                const finishReason = candidate?.finishReason || "UNKNOWN";
+                throw new Error(`API returned no content. Finish reason: ${finishReason}`);
+            } catch (error) {
+                console.error(`API call attempt ${i + 1} failed:`, error);
+                if (i === retries - 1) throw error;
+                await new Promise(resolve => setTimeout(resolve, delay * Math.pow(2, i)));
+            }
+        }
+    }
+
+    function showResults() {
+        switchView('results');
+        aiAnalysisContainer.classList.add('hidden');
+        aiAnalysisText.innerHTML = '';
+        const percentage = questions.length > 0 ? Math.round((score / questions.length) * 100) : 0;
+        finalScore.textContent = `${score} / ${questions.length} (${percentage}%)`;
+        
+        if (percentage >= 75) finalMessage.textContent = "Excellent work! You have passed the test.";
+        else if (percentage >= 60) finalMessage.textContent = "Good effort. You're close, but a little more review is needed.";
+        else finalMessage.textContent = "Keep practicing. Review the explanations to improve your understanding.";
+        
+        motivationalQuote.textContent = `"${quotes[Math.floor(Math.random() * quotes.length)]}"`;
+    }
+    
+    function updateScoreDisplay() {
+        scoreText.textContent = `Score: ${score}`;
+    }
+
+    function showReview() {
+        switchView('review');
+        reviewContainer.innerHTML = ''; // Clear previous review
+        questions.forEach((q, index) => {
+            const questionDiv = document.createElement('div');
+            questionDiv.className = 'p-4 border border-gray-200 rounded-lg bg-white';
+            const optionsHtml = q.options.map(opt => {
+                let classes = 'review-option block p-3 my-1 border-l-4';
+                if (opt.char === q.correct) classes += ' correct';
+                if (opt.char === q.userAnswer && q.userAnswer !== q.correct) classes += ' user-choice';
+                if (opt.char === q.userAnswer && opt.char === q.correct) classes += ' correct user-choice'; 
+                
+                let label = '';
+                if(opt.char === q.correct && opt.char === q.userAnswer) {
+                    label = '(Your Correct Answer)';
+                } else if (opt.char === q.correct) {
+                    label = '(Correct Answer)';
+                } else if (opt.char === q.userAnswer) {
+                    label = '(Your Answer)';
+                }
+
+                return `<div class="${classes}"><span class="font-bold">${opt.char.toUpperCase()})</span> ${opt.text} <span class="text-sm font-semibold ml-2">${label}</span></div>`;
+
+            }).join('');
+            
+            questionDiv.innerHTML = `
+                <p class="font-semibold text-lg mb-3">${index + 1}. ${q.text}</p>
+                <div class="space-y-1 mb-4">${optionsHtml}</div>
+                <details class="bg-sky-50 rounded-lg p-3">
+                    <summary class="font-semibold text-sky-800 cursor-pointer">Show Explanation</summary>
+                    <p class="mt-2 text-gray-700 leading-relaxed">${q.explanation.replace(/\n/g, '<br>') || "Explanation was not generated for this question."}</p>
+                </details>
+            `;
+            reviewContainer.appendChild(questionDiv);
+        });
+    }
+
+    async function shareScore() {
+        const percentage = questions.length > 0 ? Math.round((score / questions.length) * 100) : 0;
+        const shareText = `I scored ${percentage}% on the MAX Mock Test for DGCA prep! Think you can do better?`;
+        const shareData = {
+            title: 'MAX Mock Test',
+            text: shareText,
+        };
+
+        try {
+            if (navigator.share) {
+                await navigator.share(shareData);
+            } else {
+                 await navigator.clipboard.writeText(shareText);
+                 shareFeedback.textContent = 'Score copied to clipboard!';
+                 setTimeout(() => shareFeedback.textContent = '', 2000);
+            }
+        } catch (err) {
+            console.error('Share failed:', err);
+            shareFeedback.textContent = 'Could not share score.';
+            setTimeout(() => shareFeedback.textContent = '', 2000);
+        }
+    }
+
+    async function handleAiAnalysis() {
+        aiAnalysisContainer.classList.remove('hidden');
+        aiAnalysisSpinner.classList.remove('hidden');
+        aiAnalysisText.textContent = 'Analyzing your performance...';
+
+        const incorrectQuestions = questions.filter(q => q.userAnswer !== q.correct);
+
+        if (incorrectQuestions.length === 0) {
+            aiAnalysisSpinner.classList.add('hidden');
+            aiAnalysisText.textContent = "Congratulations! You answered all questions correctly. No weak areas to report.";
+            return;
+        }
+
+        const promptContent = incorrectQuestions.map(q => 
+            `Question: ${q.text}\nYour Answer: (${q.userAnswer}) ${q.options.find(o => o.char === q.userAnswer)?.text}\nCorrect Answer: (${q.correct}) ${q.options.find(o => o.char === q.correct)?.text}`
+        ).join('\n\n');
+
+        const systemPrompt = "You are an expert DGCA aviation exam instructor. Analyze the user's incorrect answers. Identify the key weak areas or common themes of misunderstanding. Provide a concise, bulleted list of topics they should focus on for their studies. Be encouraging and direct.";
+        const userPrompt = `Based on these incorrect answers, what are my primary weak areas?\n\n${promptContent}`;
+        
+        try {
+            const result = await makeApiCall(userPrompt, systemPrompt);
+            aiAnalysisText.innerHTML = result.replace(/\n/g, '<br>');
+        } catch (error) {
+            aiAnalysisText.textContent = "Sorry, an error occurred while generating the analysis.";
+            console.error("AI Analysis Error:", error);
+        } finally {
+            aiAnalysisSpinner.classList.add('hidden');
+        }
+    }
+
+    async function handleGenerateNewTest() {
+        pdfStatus.textContent = "✨ Generating a new test based on these topics...";
+        pdfStatus.classList.remove('hidden');
+        switchView('upload');
+        questionsInput.value = "Please wait, the AI is creating new questions for you...";
+        questionsInput.disabled = true;
+
+        const topicSource = questions.map(q => q.text).join('\n');
+        const systemPrompt = `You are a DGCA exam question generator. Create 5 new, unique, high-quality multiple-choice questions based on the topics from the provided questions. Ensure they follow the DGCA pattern. Format the output exactly as: number, question, options (a), (b), (c). Do not include the correct answer in the output.`;
+        const userPrompt = `Generate 5 new questions from these topics:\n\n${topicSource}`;
+
+        try {
+            const result = await makeApiCall(userPrompt, systemPrompt);
+            questionsInput.value = result;
+            pdfStatus.textContent = "New test generated successfully! You can start now.";
+        } catch (error) {
+            questionsInput.value = "Sorry, could not generate new questions. Please try again.";
+            pdfStatus.textContent = "Error generating test.";
+            console.error("Generate Test Error:", error);
+        } finally {
+            questionsInput.disabled = false;
+        }
+    }
+
+</script>
+</body>
+</html>
+
